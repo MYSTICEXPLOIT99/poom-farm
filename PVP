@@ -2784,150 +2784,127 @@ Tab_server:Button({
     end
 })
 
-Tab_ESP:Toggle({
-    Title = "ltiems",
-    Default = true,
-    Callback = function(state)
-        groundItemsESPEnabled = state
-        if not state then
-            for _, d in pairs(item_drawings) do
-                if d.name then d.name.Visible = false end
-                if d.highlight then d.highlight.Enabled = false end
-            end
-        end
+-- ==================== TAB เลือกเซิร์ฟทุกประเทศ ====================
+local Tab_hop = Window:Tab({
+    Title = "Join Server",
+    Icon = "earth"
+})
+
+Tab_hop:Section({Title = "เลือกประเทศ / ภูมิภาค"})
+
+local selectedCountry = "Random"
+
+local countries = {
+    "Random (สุ่มทั่วโลก)",
+    "Thailand / SEA",
+    "Singapore",
+    "Japan",
+    "South Korea",
+    "Arab / Middle East",     
+    "Saudi Arabia",           
+    "UAE",                   
+    "Egypt",                  
+    "Turkey",
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Germany",
+    "France",
+    "Brazil",
+    "Australia",
+    "Europe (ทั่วไป)",
+    "North America (ทั่วไป)"
+}
+
+local countryDropdown = Tab_hop:Dropdown({
+    Title = "🌍 เลือกประเทศ",
+    Values = countries,
+    Value = "Random (สุ่มทั่วโลก)",
+    Callback = function(value)
+        selectedCountry = value
     end
 })
 
-Tab_ESP:Toggle({
-    Title = 'Inventory Viewer V.2',
-    Default = false,
-    Desc = "ดูของแบบชื่อ",
-    Callback = function(Value)
-        _G.InventoryViewerEnabled = Value
+Tab_hop:Divider()
 
-        local Players = game:GetService('Players')
-        local ReplicatedStorage = game:GetService('ReplicatedStorage')
-        local Client = Players.LocalPlayer
-
-        local BillboardCache = {}
-
-        local function GetColorFromRarity(rarityName)
-            local colors = {
-                ['Common'] = Color3.fromRGB(255, 255, 255),
-                ['UnCommon'] = Color3.fromRGB(99, 255, 52),
-                ['Rare'] = Color3.fromRGB(51, 170, 255),
-                ['Legendary'] = Color3.fromRGB(255, 150, 0),
-                ['Epic'] = Color3.fromRGB(237, 44, 255),
-                ['Omega'] = Color3.fromRGB(255, 20, 51),
-            }
-            return colors[rarityName] or Color3.fromRGB(255,255,255)
+Tab_hop:Button({
+    Title = "่join",
+    Desc = "ค้นหาและย้ายเซิร์ฟอัตโนมัติ",
+    Callback = function()
+        if selectedCountry == "Random (สุ่มทั่วโลก)" then
+            WindUI:Notify({Title = "Hop แบบสุ่มทั่วโลก...", Duration = 2})
+            game:GetService("TeleportService"):Teleport(game.PlaceId)
+            return
         end
 
-        if Value then
-            if not _G.ViewerRunning then
-                _G.ViewerRunning = true
+        WindUI:Notify({
+            Title = "🔍 กำลังค้นหาเซิร์ฟ " .. selectedCountry,
+            Duration = 4
+        })
 
-                task.spawn(function()
-                    while task.wait(0.35) do
-                        if not _G.InventoryViewerEnabled then continue end
+        local HttpService = game:GetService("HttpService")
+        local TeleportService = game:GetService("TeleportService")
+        local PlaceId = game.PlaceId
+        local maxAttempts = 20
+        local attempt = 0
 
-                        pcall(function()
-                            for _, v in pairs(Players:GetPlayers()) do
-                                if v == Client or not v.Character or not v.Character:FindFirstChild('HumanoidRootPart') then 
-                                    if BillboardCache[v] then
-                                        BillboardCache[v]:Destroy()
-                                        BillboardCache[v] = nil
-                                    end
-                                    continue 
-                                end
-
-                                local root = v.Character.HumanoidRootPart
-
-                                local gui = BillboardCache[v]
-                                if not gui then
-                                    gui = Instance.new('BillboardGui')
-                                    gui.Name = 'ItemBillboard'
-                                    gui.AlwaysOnTop = true
-                                    gui.Size = UDim2.new(0, 190, 0, 140)           -- เล็กลงนิด
-                                    gui.StudsOffset = Vector3.new(0, -19.5, 0)     -- ล็อกต่ำสุด (ตรงกรอบแดง)
-                                    gui.ExtentsOffsetWorldSpace = Vector3.new(0, -9, 0)
-                                    gui.LightInfluence = 0
-                                    gui.MaxDistance = 0
-                                    gui.Parent = root                               -- Parent ที่ Root
-                                    BillboardCache[v] = gui
-
-                                    local bg = Instance.new('Frame')
-                                    bg.Name = 'BG'
-                                    bg.BackgroundTransparency = 1
-                                    bg.Size = UDim2.new(1, 0, 1, 0)
-                                    bg.Parent = gui
-
-                                    local layout = Instance.new('UIListLayout')
-                                    layout.FillDirection = Enum.FillDirection.Vertical
-                                    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-                                    layout.VerticalAlignment = Enum.VerticalAlignment.Top
-                                    layout.Padding = UDim.new(0, 1)
-                                    layout.Parent = bg
-                                end
-
-                                local bg = gui:FindFirstChild('BG')
-                                if not bg then continue end
-
-                                local currentItems = {}
-
-                                for _, container in pairs({v:FindFirstChild('Backpack'), v.Character}) do
-                                    if container then
-                                        for _, tool in pairs(container:GetChildren()) do
-                                            if tool:IsA('Tool') and not tool:GetAttribute('JobTool') and not tool:GetAttribute('Locked') then
-                                                local itemFolder = tool:GetAttribute('AmmoType') and ReplicatedStorage.Items.gun or ReplicatedStorage.Items.melee
-                                                for _, z in pairs(itemFolder:GetChildren()) do
-                                                    if tool:GetAttribute('RarityName') == z:GetAttribute('RarityName')
-                                                    and tool:GetAttribute('RarityPrice') == z:GetAttribute('RarityPrice') then
-                                                        currentItems[z.Name] = GetColorFromRarity(z:GetAttribute('RarityName'))
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-
-                                for _, child in pairs(bg:GetChildren()) do
-                                    if child:IsA('TextLabel') and not currentItems[child.Name] then
-                                        child:Destroy()
-                                    end
-                                end
-
-                                for itemName, color in pairs(currentItems) do
-                                    local txt = bg:FindFirstChild(itemName)
-                                    if not txt then
-                                        txt = Instance.new('TextLabel')
-                                        txt.Name = itemName
-                                        txt.Size = UDim2.new(1, 0, 0, 14)
-                                        txt.BackgroundTransparency = 1
-                                        txt.Text = "[" .. itemName .. "]"
-                                        txt.TextColor3 = color
-                                        txt.TextSize = 12.5
-                                        txt.Font = Enum.Font.Code
-                                        txt.TextStrokeTransparency = 0
-                                        txt.TextStrokeColor3 = Color3.new(0,0,0)
-                                        txt.TextXAlignment = Enum.TextXAlignment.Center
-                                        txt.Parent = bg
-                                    end
-                                end
-
-                                gui.Enabled = true
-                            end
-                        end)
-                    end
+        task.spawn(function()
+            while attempt < maxAttempts do
+                attempt = attempt + 1
+                
+                local success, servers = pcall(function()
+                    return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..PlaceId.."/servers/Public?sortOrder=Desc&limit=100"))
                 end)
+
+                if success and servers and servers.data then
+                    for _, server in ipairs(servers.data) do
+                        if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                            
+                            local playerCount = server.playing
+                            local shouldTake = false
+
+                            -- กรองตามประเทศ (ประมาณการจากจำนวนผู้เล่น)
+                            if selectedCountry:find("Thailand") or selectedCountry:find("SEA") or selectedCountry:find("Singapore") or 
+                               selectedCountry:find("Japan") or selectedCountry:find("Korea") or selectedCountry:find("Philippines") or 
+                               selectedCountry:find("Vietnam") or selectedCountry:find("Indonesia") then
+                                if playerCount >= 6 and playerCount <= 25 then shouldTake = true end
+                                
+                            elseif selectedCountry:find("United States") or selectedCountry:find("Canada") or selectedCountry:find("North America") then
+                                if playerCount <= 18 then shouldTake = true end
+                                
+                            elseif selectedCountry:find("United Kingdom") or selectedCountry:find("Germany") or selectedCountry:find("France") or 
+                                   selectedCountry:find("Spain") or selectedCountry:find("Italy") or selectedCountry:find("Europe") then
+                                if playerCount <= 15 then shouldTake = true end
+                                
+                            elseif selectedCountry:find("Brazil") or selectedCountry:find("Mexico") or selectedCountry:find("Turkey") then
+                                if playerCount >= 5 and playerCount <= 20 then shouldTake = true end
+                                
+                            elseif selectedCountry:find("Australia") then
+                                if playerCount <= 12 then shouldTake = true end
+                            end
+
+                            if shouldTake then
+                                WindUI:Notify({
+                                    Title = "✅ พบเซิร์ฟ " .. selectedCountry .. "!",
+                                    Description = "กำลังย้าย... (" .. playerCount .. " คน)",
+                                    Duration = 3
+                                })
+                                TeleportService:TeleportToPlaceInstance(PlaceId, server.id, game.Players.LocalPlayer)
+                                return
+                            end
+                        end
+                    end
+                end
+                
+                task.wait(1.5)
             end
-        else
-            _G.ViewerRunning = false
-            for _, gui in pairs(BillboardCache) do
-                if gui then gui:Destroy() end
-            end
-            BillboardCache = {}
-        end
+
+            WindUI:Notify({
+                Title = "❌ ไม่พบเซิร์ฟ " .. selectedCountry,
+                Description = "ลองกดใหม่อีกครั้ง หรือเลือก Random",
+                Duration = 5
+            })
+        end)
     end
 })
 
