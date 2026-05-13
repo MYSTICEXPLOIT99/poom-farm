@@ -2908,4 +2908,19 @@ Tab_hop:Button({
     end
 })
 
+Tab_hop:Button({
+    Title = "🏜 Hop เซิร์ฟอาหรับ",
+    Desc = "กดเลย",
+    Callback = function()
+        WindUI:Notify({Title = "🔍 กำลังหาเซิร์ฟอาหรับ...", Duration = 3})
+        
+        for i = 1, 12 do
+            game:GetService("TeleportService"):Teleport(game.PlaceId)
+            task.wait(2.5)
+        end
+    end
+})
+
+
+
 print("Bypass complete")
