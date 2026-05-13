@@ -21,7 +21,7 @@ local CharModule = require(ReplicatedStorage.Modules.Core.Char)
 local RagdollModule = require(ReplicatedStorage.Modules.Game.Ragdoll)
 
 local Done = false
-local LogoID = "rbxassetid://116316450260880"
+local LogoID = "rbxassetid://76738700888155"
 _G.IsGodMode = false
 
 local function checkCondition()
@@ -56,7 +56,7 @@ end
 
 if canShowUI then
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "Vexinity Exploit"
+    screenGui.Name = "Mystic Exploit"
     screenGui.ResetOnSpawn = false
     screenGui.IgnoreGuiInset = true
     screenGui.Parent = playerGui
