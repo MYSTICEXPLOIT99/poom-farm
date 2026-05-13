@@ -128,7 +128,7 @@ if WindUI then
                end)
 
     Window:Tag({
-        Title = "V.6",
+        Title = "Version-0.6a",
         Color = Color3.fromHex("#8d1b1b"),
         Radius = 12
     })
