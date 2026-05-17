@@ -106,6 +106,18 @@ pcall(function()
     WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 end)
 
+WindUI:AddTheme({
+    Name = "840Theme",
+    Accent = Color3.fromHex("#000000"),
+    Background = Color3.fromHex("#000000"),
+    Outline = Color3.fromHex("#FFFFFF"),
+    Text = Color3.fromHex("#ffffff"),
+    Placeholder = Color3.fromHex("#595959"),
+    Button = Color3.fromHex("#595959"),
+    Icon = Color3.fromHex("#ff0000"),
+	Toggle = Color3.fromHex("#ff0000"),
+})
+
 Window = nil
 if WindUI then
     Window = WindUI:CreateWindow({
@@ -115,7 +127,7 @@ if WindUI then
         Author = "MYSTIC ",
         Folder = "BBBB HUB Now!!!",
         Size = UDim2.fromOffset(650, 400),
-        Theme = "Crimson",
+        Theme = "840Theme",
         Transparent = true,
         Resizable = true,
         KeyCode = Enum.KeyCode.G
@@ -128,7 +140,7 @@ if WindUI then
                end)
 
     Window:Tag({
-        Title = "Version-0.6a",
+        Title = "Version-0.8a",
         Color = Color3.fromHex("#8d1b1b"),
         Radius = 12
     })
