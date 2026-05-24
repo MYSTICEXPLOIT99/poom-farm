@@ -1,65 +1,39 @@
-print("Loading Function")
+Players = game:GetService("Players")
+RunService = game:GetService("RunService")
+ReplicatedStorage = game:GetService("ReplicatedStorage")
+UserInputService = game:GetService("UserInputService")
+TweenService = game:GetService("TweenService")
+Debris = game:GetService("Debris")
+Workspace = game:GetService("Workspace")
+ContextActionService = game:GetService("ContextActionService")
+Remotes = ReplicatedStorage:WaitForChild("Remotes")
+Util = require(ReplicatedStorage.Modules.Core.Util)
+BuyPromptUI = require(ReplicatedStorage.Modules.Game.UI.BuyPromptUI)
+EmotesUI = require(ReplicatedStorage.Modules.Game.Emotes.EmotesUI)
+EmotesList = require(ReplicatedStorage.Modules.Game.Emotes.EmotesList)
+CoreUI = require(ReplicatedStorage.Modules.Core.UI)
+CharModule = require(ReplicatedStorage.Modules.Core.Char)
+ItemsFolder = ReplicatedStorage:WaitForChild("Items")
+MeleeFolder = ItemsFolder:WaitForChild("melee")
+LocalPlayer = Players.LocalPlayer
+Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+Humanoid = Character:WaitForChild("Humanoid")
+HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+Client = Players.LocalPlayer
+item_drawings = {}
+droppedItems = workspace:WaitForChild("DroppedItems")
 
-local game = game
-if typeof(game) ~= "Instance" then game = workspace.Parent end
+Camera = Workspace.CurrentCamera
+Mouse = LocalPlayer:GetMouse()
+isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+WindUI = nil
+pcall(function()
+    WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+end)
 
-Players = game.Players
-repeat 
-	Client = Players.LocalPlayer
-	wait()
-until Client
+Window = nil
+if WindUI then
 
-local Char = Client.Character
-local Humanoid = Char.Humanoid
-local Root = Char.HumanoidRootPart
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HttpService = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
-local PathfindingService = game:GetService("PathfindingService")
-local CollectionService = game:GetService("CollectionService")
-
-do
-	Writefile = writefile
-	Readfile = readfile
-	Isfile = isfile
-	Isfolder = isfolder
-	Makefolder = makefolder
-	Delfile = delfile
-end
-
-do
-	FileName = tostring(Client.UserId).."_Settings.json"
-	BaseFolder = "Mystic Hub"
-	SubFolder = "Blox Spin"
-end
-
-local Config = {}
-
-function SaveSetting() 
-	local json = HttpService:JSONEncode(Config)
-
-	if not Isfolder(BaseFolder) then
-		Makefolder(BaseFolder)
-	end
-	if not Isfolder(BaseFolder.."/"..SubFolder) then
-		Makefolder(BaseFolder.."/"..SubFolder)
-	end
-
-	Writefile(BaseFolder.."/"..SubFolder.."/"..FileName, json)
-end
-
-function LoadSetting()
-	if Isfile(BaseFolder.."/"..SubFolder.."/"..FileName) then
-		Config = HttpService:JSONDecode(Readfile(BaseFolder.."/"..SubFolder.."/"..FileName))
-	end
-end
-
-LoadSetting()
-
----------------------------------------------------------------------
-do
-	local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 	local ThemeName = "Dark"
 
 	local Window = Library:CreateWindow({
