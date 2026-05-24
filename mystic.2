@@ -1,0 +1,79 @@
+print("Loading Function")
+
+local game = game
+if typeof(game) ~= "Instance" then game = workspace.Parent end
+
+Players = game.Players
+repeat 
+	Client = Players.LocalPlayer
+	wait()
+until Client
+
+local Char = Client.Character
+local Humanoid = Char.Humanoid
+local Root = Char.HumanoidRootPart
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local PathfindingService = game:GetService("PathfindingService")
+local CollectionService = game:GetService("CollectionService")
+
+do
+	Writefile = writefile
+	Readfile = readfile
+	Isfile = isfile
+	Isfolder = isfolder
+	Makefolder = makefolder
+	Delfile = delfile
+end
+
+do
+	FileName = tostring(Client.UserId).."_Settings.json"
+	BaseFolder = "Mystic Hub"
+	SubFolder = "Blox Spin"
+end
+
+local Config = {}
+
+function SaveSetting() 
+	local json = HttpService:JSONEncode(Config)
+
+	if not Isfolder(BaseFolder) then
+		Makefolder(BaseFolder)
+	end
+	if not Isfolder(BaseFolder.."/"..SubFolder) then
+		Makefolder(BaseFolder.."/"..SubFolder)
+	end
+
+	Writefile(BaseFolder.."/"..SubFolder.."/"..FileName, json)
+end
+
+function LoadSetting()
+	if Isfile(BaseFolder.."/"..SubFolder.."/"..FileName) then
+		Config = HttpService:JSONDecode(Readfile(BaseFolder.."/"..SubFolder.."/"..FileName))
+	end
+end
+
+LoadSetting()
+
+---------------------------------------------------------------------
+do
+	local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+	local ThemeName = "Dark"
+
+	local Window = Library:CreateWindow({
+		Title = "MYSTIC EXPLOIT",
+		Author = "Dev by Mystic",
+		Icon = "rbxassetid://76738700888155",
+		Theme = ThemeName,
+		HideSearchBar = false,
+		Transparent = true,
+		ToggleKey = Enum.KeyCode.G,
+		Resizable = true,
+	})
+	
+	local Tag = Window:Tag({
+		Title = "Mystic Farm🌾",
+		Color = "Text",
+	})
